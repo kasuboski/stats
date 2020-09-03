@@ -20,6 +20,7 @@ jobs:
     - name: Commit Stats
       id: commit-stats
       run: |
+        ls -la
         mv dev-to-stats/stats.json stats/dev-to.json
         rm -rf dev-to-stats/
         git config --local user.email "action@github.com"
