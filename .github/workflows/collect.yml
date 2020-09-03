@@ -24,7 +24,7 @@ jobs:
       uses: EndBug/add-and-commit@v4
       with:
         author_name: GitHub Actions
-        author_email: josh.kasuboski@gmail.com
+        author_email: "41898282+github-actions[bot]@users.noreply.github.com"
         message: "Update stats"
         add: stats/dev-to.json
       env:
