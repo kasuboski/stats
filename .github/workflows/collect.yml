@@ -1,0 +1,36 @@
+name: Get Stats
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+
+jobs:
+  dev-to-stats:
+    runs-on: ubuntu-latest
+    name: Get Stats from Dev.to
+    steps:
+    - uses: actions/checkout@master
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+    - name: Get Dev.to Stats
+      uses: kasuboski/dev-to-stats-action@v1
+      with:
+        apiKey: ${{ secrets.API_KEY }}
+    - name: Commit Stats
+      id: commit-stats
+      run: |
+        mv dev-to-stats/stats.json stats/dev-to.json
+        rm -rf dev-to-stats/
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add --all
+        if output=$(git status --porcelain) && [ -z "$output" ]; then
+          echo "::set-output name=changed::false"
+        else 
+          echo "::set-output name=changed::true"
+        fi
+    - name: Push Changes
+      if: steps.commit-stats.outputs.changed
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
