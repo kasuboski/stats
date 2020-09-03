@@ -9,31 +9,23 @@ jobs:
     runs-on: ubuntu-latest
     name: Get Stats from Dev.to
     steps:
-    - uses: actions/checkout@master
-      with:
-        persist-credentials: false
-        fetch-depth: 0
+    - uses: actions/checkout@v2
     - name: Get Dev.to Stats
       uses: kasuboski/dev-to-stats-action@v1
       with:
         apiKey: ${{ secrets.API_KEY }}
-    - name: Commit Stats
+    - name: Move stats file
       id: commit-stats
       run: |
         mkdir -p stats
         mv dev-to-stats/stats.json stats/dev-to.json
         rm -rf dev-to-stats/
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add --all
-        if output=$(git status --porcelain) && [ -z "$output" ]; then
-          echo "::set-output name=changed::false"
-        else 
-          echo "::set-output name=changed::true"
-        fi
     - name: Push Changes
-      if: steps.commit-stats.outputs.changed
-      uses: ad-m/github-push-action@v0.6.0
+      uses: EndBug/add-and-commit@v4
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: 'main'
+        author_name: GitHub Actions
+        author_email: josh.kasuboski@gmail.com
+        message: "Update stats"
+        add: stats/dev-to.json
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
